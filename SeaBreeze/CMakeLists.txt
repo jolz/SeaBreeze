@@ -1065,9 +1065,21 @@ elseif(UNIX)
 # need to copy os-support/linux/FilesToInstall/10-oceanoptics.rules to the rules folder
 
     message("Building for Unix-like platforms")
+
+    # Added for newer versions of gcc
+    set( CMAKE_C_FLAGS  "${CMAKE_C_FLAGS} -std=gnu99" ) # c99 failed to build.
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+        # only check gcc
+        set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-error=misleading-indentation")
+    endif(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 5)
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8)
+        # only check gcc
+        set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -Wno-catch-value -Wno-class-memaccess")
+    endif(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 8)
+
     #add_compile_options(-std=c++0x)
     set( CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -ggdb -Wall -Wunused -Wmissing-include-dirs -Werror -O0 -fpic -fno-stack-protector" )
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -gdb -pthread -lpthread")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -ggdb -pthread -lpthread")
 
     set(PLATFORM_SOURCE_FILES
         src/native/usb/linux/NativeUSBLinux.c
@@ -1094,7 +1106,7 @@ target_link_libraries(demo-averaging SeaBreeze)
 add_executable(demo-named-spectrometer "sample-code/c/demo-named-spectrometer.c" "sample-code/c/util.h" "sample-code/c/util.c")
 target_link_libraries(demo-named-spectrometer SeaBreeze)
 
-add_executable(demo-pthreads "sample-code/c/demo-pthreads" "sample-code/c/util.h" "sample-code/c/util.c")
+add_executable(demo-pthreads "sample-code/c/demo-pthreads.c" "sample-code/c/util.h" "sample-code/c/util.c")
 target_link_libraries(demo-pthreads SeaBreeze)
 
 add_executable(demo-qepro-api "sample-code/c/demo-qepro-api.c" "sample-code/c/util.h" "sample-code/c/util.c")
